@@ -30,7 +30,7 @@ const CLOSE_NOTES=[1046.5,783.99,659.25,523.25];  /* C6 G5 E5 C5, falling */
 
 /* cinematic reveal on arrival: the screen holds for a beat, then the iris opens */
 const pt=document.getElementById('pageTransition');
-setTimeout(()=>{if(!MOBILE_PERF)melody(OPEN_NOTES,.32,1.15,.05);pt.classList.add('hide')},MOBILE_PERF?120:450);
+setTimeout(()=>{melody(OPEN_NOTES,.32,1.15,.05);pt.classList.add('hide')},900);
 
 /* scroll progress bar */
 const bar=document.getElementById('progress');
@@ -39,20 +39,19 @@ addEventListener('scroll',()=>{const h=document.documentElement;const p=(h.scrol
 /* stars + colourful particles + shooting stars + falling rocks + gentle rain, with gentle parallax */
 const cv=document.getElementById('sky'),x=cv.getContext('2d');let W,H,S=[],shoot=[],rocks=[],rain=[];
 const REDUCE_MOTION=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const MOBILE_PERF=matchMedia('(max-width: 768px), (pointer: coarse)').matches;
 let mx=0,my=0;addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2});
 function rockShape(){const n=6+Math.floor(Math.random()*3),pts=[];for(let k=0;k<n;k++){const a=(k/n)*Math.PI*2,r=.6+Math.random()*.4;pts.push([Math.cos(a)*r,Math.sin(a)*r])}return pts}
 function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;
-  S=Array.from({length:Math.min(MOBILE_PERF?28:260,W/(MOBILE_PERF?28:4))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.4,p:Math.random()*6,v:Math.random()*.3+.05,d:Math.random()*.8+.2,c:PALETTE[Math.floor(Math.random()*PALETTE.length)]}));
-  rocks=Array.from({length:Math.min(MOBILE_PERF?0:16,W/(MOBILE_PERF?9999:70))},()=>({x:Math.random()*W,y:Math.random()*H,sz:5+Math.random()*7,rot:Math.random()*7,vr:(Math.random()-.5)*.03,vy:.4+Math.random()*.6,shape:rockShape()}));
-  rain=Array.from({length:Math.min(MOBILE_PERF?0:160,W/5)},()=>({x:Math.random()*W,y:Math.random()*H,len:10+Math.random()*14,v:4+Math.random()*4,a:.08+Math.random()*.14}))}
+  S=Array.from({length:Math.min(matchMedia('(max-width: 768px)').matches?70:260,W/(matchMedia('(max-width: 768px)').matches?12:4))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.4,p:Math.random()*6,v:Math.random()*.3+.05,d:Math.random()*.8+.2,c:PALETTE[Math.floor(Math.random()*PALETTE.length)]}));
+  rocks=Array.from({length:Math.min(matchMedia('(max-width: 768px)').matches?4:16,W/(matchMedia('(max-width: 768px)').matches?240:70))},()=>({x:Math.random()*W,y:Math.random()*H,sz:5+Math.random()*7,rot:Math.random()*7,vr:(Math.random()-.5)*.03,vy:.4+Math.random()*.6,shape:rockShape()}));
+  rain=Array.from({length:Math.min(matchMedia('(max-width: 768px)').matches?0:160,W/5)},()=>({x:Math.random()*W,y:Math.random()*H,len:10+Math.random()*14,v:4+Math.random()*4,a:.08+Math.random()*.14}))}
 rs();addEventListener('resize',rs);
 function maybeShoot(){if(Math.random()<.012&&shoot.length<2){const sy=Math.random()*H*.4,sx=Math.random()*W;shoot.push({x:sx,y:sy,vx:-6-Math.random()*4,vy:3+Math.random()*2,life:1})}}
 let lastCanvasFrame=0;
 (function f(t){if(t-lastCanvasFrame<33){if(!REDUCE_MOTION)requestAnimationFrame(f);return}lastCanvasFrame=t;x.clearRect(0,0,W,H);
   S.forEach((s,k)=>{const g=k%3==0;if(g){s.y-=s.v;if(s.y<0)s.y=H}
-    x.globalAlpha=MOBILE_PERF?.72:(.35+.65*Math.abs(Math.sin(t/1200+s.p)));
-    x.fillStyle=g?s.c:'#fff';x.shadowBlur=(!MOBILE_PERF&&g)?11:0;x.shadowColor=s.c;
+    x.globalAlpha=.35+.65*Math.abs(Math.sin(t/1200+s.p));
+    x.fillStyle=g?s.c:'#fff';x.shadowBlur=g?11:0;x.shadowColor=s.c;
     x.beginPath();x.arc(s.x+mx*10*s.d,s.y+my*10*s.d,g?s.r*1.7:s.r,0,7);x.fill()});
   maybeShoot();
   x.globalAlpha=1;
@@ -73,7 +72,7 @@ let lastCanvasFrame=0;
   if(!REDUCE_MOTION)requestAnimationFrame(f)})(0);
 
 /* ambient rising icons */
-if(!REDUCE_MOTION&&!MOBILE_PERF)setInterval(()=>{const e=document.createElement('span');e.className='ambient';e.textContent=ICONS[Math.floor(Math.random()*ICONS.length)];
+if(!REDUCE_MOTION)setInterval(()=>{const e=document.createElement('span');e.className='ambient';e.textContent=ICONS[Math.floor(Math.random()*ICONS.length)];
   e.style.left=Math.random()*94+'vw';e.style.fontSize=(14+Math.random()*14)+'px';e.style.setProperty('--sway',(Math.random()*80-40)+'px');
   const dur=10+Math.random()*8;e.style.animationDuration=dur+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),dur*1000)},4500);
 
@@ -175,12 +174,12 @@ document.querySelectorAll('.mem-card').forEach(c=>c.addEventListener('click',()=
 /* page transitions: iris closes in slowly over the destination's message, then navigates */
 document.addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;const href=a.getAttribute('href');if(!href||!/\.html$/.test(href))return;
   e.preventDefault();
+  if(cur==='start'){const r=a.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,90,Math.min(innerWidth,700));pt.classList.add('rainbow')}
   const dest=href.replace('.html','');
-  if(!MOBILE_PERF&&cur==='start'){const r=a.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,90,Math.min(innerWidth,700));pt.classList.add('rainbow')}
-  pt.querySelector('.pt-inner').textContent=MOBILE_PERF?'Opening…':(MSG[dest]||'Turning the page');
-  if(!MOBILE_PERF)melody(CLOSE_NOTES,.28,1.1,.05);
+  pt.querySelector('.pt-inner').innerHTML=(MSG[dest]||'Turning the page')+dots;
+  melody(CLOSE_NOTES,.28,1.1,.05);
   pt.classList.remove('hide');
-  setTimeout(()=>{location.href=href},MOBILE_PERF?420:850)});
+  setTimeout(()=>{location.href=href},2600)});
 
 /* three clocks on The Time page */
 if(cur==='time'){
@@ -233,18 +232,18 @@ if(env){
     const r=env.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
     melody([523.25,659.25,783.99,1046.5,1318.5,1568],.17,1.4,.05);
     /* sparkle burst */
-    for(let k=0;k<(MOBILE_PERF?8:40);k++){const b=document.createElement('span');b.className='burst';const sz=4+Math.random()*7;
+    for(let k=0;k<40;k++){const b=document.createElement('span');b.className='burst';const sz=4+Math.random()*7;
       b.style.width=b.style.height=sz+'px';b.style.left=cx+'px';b.style.top=cy+'px';
       b.style.background=CONFETTI_COLS[Math.floor(Math.random()*CONFETTI_COLS.length)];
       const ang=Math.random()*Math.PI*2,dist=70+Math.random()*180;
       b.style.setProperty('--dx',Math.cos(ang)*dist+'px');b.style.setProperty('--dy',Math.sin(ang)*dist+'px');
       document.body.appendChild(b);setTimeout(()=>b.remove(),1000)}
     /* rainbow shockwaves, confetti bursts, a rain of confetti, hearts floating up */
-    for(let k=0;k<(MOBILE_PERF?1:4);k++)setTimeout(()=>openRing(cx,cy),k*280);
-    setTimeout(()=>confetti(cx,cy,MOBILE_PERF?12:80,Math.min(innerWidth,680)),500);
-    if(!MOBILE_PERF)setTimeout(()=>confetti(cx,cy-60,70,Math.min(innerWidth,760)),1250);
-    if(!MOBILE_PERF)setTimeout(()=>confettiRain(80),700);
-    for(let k=0;k<(MOBILE_PERF?4:16);k++)setTimeout(()=>floatHeart(cx,cy),350+k*150);
+    for(let k=0;k<4;k++)setTimeout(()=>openRing(cx,cy),k*280);
+    setTimeout(()=>confetti(cx,cy,80,Math.min(innerWidth,680)),500);
+    setTimeout(()=>confetti(cx,cy-60,70,Math.min(innerWidth,760)),1250);
+    setTimeout(()=>confettiRain(80),700);
+    for(let k=0;k<16;k++)setTimeout(()=>floatHeart(cx,cy),350+k*150);
     /* the envelope settles away and the letter appears */
     setTimeout(()=>env.classList.add('done'),2500);
     setTimeout(()=>{const p=document.querySelector('.paper');p.classList.remove('hidden');
