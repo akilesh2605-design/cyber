@@ -42,12 +42,13 @@ const REDUCE_MOTION=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let mx=0,my=0;addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2});
 function rockShape(){const n=6+Math.floor(Math.random()*3),pts=[];for(let k=0;k<n;k++){const a=(k/n)*Math.PI*2,r=.6+Math.random()*.4;pts.push([Math.cos(a)*r,Math.sin(a)*r])}return pts}
 function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;
-  S=Array.from({length:Math.min(260,W/4)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.4,p:Math.random()*6,v:Math.random()*.3+.05,d:Math.random()*.8+.2,c:PALETTE[Math.floor(Math.random()*PALETTE.length)]}));
-  rocks=Array.from({length:Math.min(16,W/70)},()=>({x:Math.random()*W,y:Math.random()*H,sz:5+Math.random()*7,rot:Math.random()*7,vr:(Math.random()-.5)*.03,vy:.4+Math.random()*.6,shape:rockShape()}));
-  rain=Array.from({length:Math.min(160,W/5)},()=>({x:Math.random()*W,y:Math.random()*H,len:10+Math.random()*14,v:4+Math.random()*4,a:.08+Math.random()*.14}))}
+  S=Array.from({length:Math.min(matchMedia('(max-width: 768px)').matches?70:260,W/(matchMedia('(max-width: 768px)').matches?12:4))},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.4,p:Math.random()*6,v:Math.random()*.3+.05,d:Math.random()*.8+.2,c:PALETTE[Math.floor(Math.random()*PALETTE.length)]}));
+  rocks=Array.from({length:Math.min(matchMedia('(max-width: 768px)').matches?4:16,W/(matchMedia('(max-width: 768px)').matches?240:70))},()=>({x:Math.random()*W,y:Math.random()*H,sz:5+Math.random()*7,rot:Math.random()*7,vr:(Math.random()-.5)*.03,vy:.4+Math.random()*.6,shape:rockShape()}));
+  rain=Array.from({length:Math.min(matchMedia('(max-width: 768px)').matches?0:160,W/5)},()=>({x:Math.random()*W,y:Math.random()*H,len:10+Math.random()*14,v:4+Math.random()*4,a:.08+Math.random()*.14}))}
 rs();addEventListener('resize',rs);
 function maybeShoot(){if(Math.random()<.012&&shoot.length<2){const sy=Math.random()*H*.4,sx=Math.random()*W;shoot.push({x:sx,y:sy,vx:-6-Math.random()*4,vy:3+Math.random()*2,life:1})}}
-(function f(t){x.clearRect(0,0,W,H);
+let lastCanvasFrame=0;
+(function f(t){if(t-lastCanvasFrame<33){if(!REDUCE_MOTION)requestAnimationFrame(f);return}lastCanvasFrame=t;x.clearRect(0,0,W,H);
   S.forEach((s,k)=>{const g=k%3==0;if(g){s.y-=s.v;if(s.y<0)s.y=H}
     x.globalAlpha=.35+.65*Math.abs(Math.sin(t/1200+s.p));
     x.fillStyle=g?s.c:'#fff';x.shadowBlur=g?11:0;x.shadowColor=s.c;
