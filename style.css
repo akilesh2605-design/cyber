@@ -264,17 +264,3 @@ body[data-page=start] .btn::before{opacity:.95;filter:blur(12px)}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
-
-/* Extra mobile smoothness: keep the sky-blue design, minimize GPU-heavy layers. */
-@media (max-width: 768px), (pointer: coarse) {
-  html { scroll-behavior: auto; }
-  #pageTransition { transition: transform .38s ease-out !important; clip-path: none !important; }
-  #pageTransition .pt-ring { animation: none !important; width: 90px; height: 90px; }
-  #pageTransition .pt-inner { animation: none !important; text-shadow: none !important; letter-spacing: .08em; }
-  .nav { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-  .highlight, .logo, .clock .num, .btn::before, .tl::before, .env-halo { animation: none !important; filter: none !important; }
-  .btn::before { display: none !important; }
-  .reveal { transition: opacity .35s ease, transform .35s ease !important; }
-  .spark, .ambient, .burst, .open-ring, .fheart { display: none !important; }
-  #sky { opacity: .72; }
-}
